@@ -1,0 +1,4 @@
+setuptools
+pyCrypto
+pyasn1
+PIL
