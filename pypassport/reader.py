@@ -170,9 +170,11 @@ class PcscReader(Reader):
         # print ">", APDU, " so: ", APDU.getHexListAPDU()
         try:
             self.log(APDU)
+            print(APDU)
             res = self._pcsc_connection.transmit(APDU.getHexListAPDU())
             rep = ResponseAPDU(hexListToBin(res[0]), res[1], res[2])
-            # print "<" , rep
+
+            print rep
             self.log(rep)
             return rep
         except self.sc.Exceptions.CardConnectionException, msg:
@@ -334,7 +336,6 @@ class ReaderManager(Singleton):
                         # Otherwise the correct response will be '90 00'.
                         res = r.transmit(CommandAPDU("00", "A4", "04", "0C", "07", "A0000002471001"))
                         if res.sw1 == 0x90 and res.sw2 == 0x00:
-                            print "hello from auto detect 1"
                             return r
                 except Exception, msg:
                     print(msg)
@@ -365,7 +366,6 @@ class ReaderManager(Singleton):
         wait = 0.5
 
         if driver == None and readerNum == None:
-            print "hello from 1"
             r = self._autoDetect()
             while not r and cpt < timeout:
                 r = self._autoDetect()
@@ -376,7 +376,6 @@ class ReaderManager(Singleton):
             return r
 
         else:
-            # print "hello from 2"
             reader = self.create(driver)
             while not reader.connect(readerNum) and cpt < timeout:
                 time.sleep(wait)

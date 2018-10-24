@@ -97,7 +97,7 @@ class BAC(Logger):
         data = binToHexRep(cmd_data)
         lc = hexToHexRep(len(data)/2)
         toSend = apdu.CommandAPDU("00", "82", "00", "00", lc, data, "28")
-        print(toSend)
+        # print(toSend)
         return self._iso7816.transmit(toSend, "Mutual Authentication")
 
     def _computeKeysFromKseed(self, Kseed):
