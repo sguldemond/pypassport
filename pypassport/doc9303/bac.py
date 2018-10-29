@@ -88,7 +88,6 @@ class BAC(Logger):
             rnd_icc = self._iso7816.getChallenge()
             cmd_data = self.authentication(rnd_icc)
             data = self._mutualAuthentication(cmd_data)
-            print "4"
             return self.sessionKeys(data)
         except Exception, msg:
             raise BACException(msg[0])
@@ -97,7 +96,6 @@ class BAC(Logger):
         data = binToHexRep(cmd_data)
         lc = hexToHexRep(len(data)/2)
         toSend = apdu.CommandAPDU("00", "82", "00", "00", lc, data, "28")
-        # print(toSend)
         return self._iso7816.transmit(toSend, "Mutual Authentication")
 
     def _computeKeysFromKseed(self, Kseed):

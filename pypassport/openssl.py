@@ -61,10 +61,12 @@ class OpenSSL(Logger):
         """
         try:
             self._toDisk("certif.cer", certif)
+            print(trustedCertif)
             data = self._execute("verify -CApath "+trustedCertif+" certif.cer")
             data = replace(data, "certif.cer: ", "")
         finally:
-            self._remFromDisk("certif.cer")
+            print("Not removing 'certif.cer'")
+            # self._remFromDisk("certif.cer")
 
         if data[:2] == "OK":
             return True

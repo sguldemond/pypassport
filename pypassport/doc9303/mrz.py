@@ -132,7 +132,7 @@ class MRZ(object):
                   (mrz[0:10] + mrz[13:20] + mrz[21:-1], mrz[-1])
                    ]
 
-        print(fields)
+        # print(fields)
 
         return self._checkDigits(fields)
 

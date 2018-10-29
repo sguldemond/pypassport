@@ -41,7 +41,7 @@ def ConvertJp2(input):
     jp2 = open("tmp.jp2", "wb")
     jp2.write(input)
     jp2.close()
-    
+
     if isMagick == False:
         geojasper = "geojasper"
         if (sys.platform != "win32") and os.path.isfile(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', 'geojasper', geojasper)):

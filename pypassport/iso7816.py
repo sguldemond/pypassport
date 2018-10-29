@@ -156,7 +156,6 @@ class Iso7816(Logger):
 
             msg = Iso7816.Errors[res.sw1][res.sw2]
             
-            print(str(res) + " // " + msg)
             self.log(str(res)+" //" + msg)
 
             if msg == "Success":

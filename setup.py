@@ -53,7 +53,7 @@ setup(
         'pyCrypto',
         'pyasn1',
         #'pyscard', # Unless mac, check lin/win asap
-        'PIL'
+        #'PIL'
     ],
 
     zip_safe = False

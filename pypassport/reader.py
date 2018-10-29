@@ -170,12 +170,12 @@ class PcscReader(Reader):
         # print ">", APDU, " so: ", APDU.getHexListAPDU()
         try:
             self.log(APDU)
-            print(APDU)
+            # print(APDU)
             res = self._pcsc_connection.transmit(APDU.getHexListAPDU())
             rep = ResponseAPDU(hexListToBin(res[0]), res[1], res[2])
 
-            print rep
             self.log(rep)
+            # print(rep)
             return rep
         except self.sc.Exceptions.CardConnectionException, msg:
             raise ReaderException(msg)

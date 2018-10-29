@@ -172,7 +172,8 @@ class EPassport(dict, logger.Logger):
         self._bac = bac.BAC(self._iso7816)
         self._bac.register(self._logFct)
 
-        self._openSSL = openssl.OpenSSL()
+        # Added OpenSSL location
+        self._openSSL = openssl.OpenSSL('/usr/bin/openssl')
         self._openSSL.register(self._logFct)
 
         self._aa = activeauthentication.ActiveAuthentication(self._iso7816, self._openSSL)
@@ -243,6 +244,7 @@ class EPassport(dict, logger.Logger):
         try:
             if dg15 == None:
                 dg15 = self["DG15"]
+            
             res = self._aa.executeAA(dg15)
             return res
         except datagroup.DataGroupException, msg:
@@ -325,9 +327,26 @@ class EPassport(dict, logger.Logger):
         Read the common file of the passport.
 
         @return: A list with the data group tags present in the passport.
-        """
+        """        
+
+        # Temp fix for 6F63 Data not found issue
+        double_tag = False
+        ef_com = self["Common"]["5C"]
+        for tag in ef_com:
+            if tag == "6F63":
+                ef_com.append("6F")
+                ef_com.append("63")
+                double_tag = True
+        
+        if double_tag:
+            ef_com.remove("6F63")
+        
+        # print(ef_com)
+        ###
+
         list = []
-        for tag in self["Common"]["5C"]:
+        # Reading 'ef_com' instead of 'self["Common"]["5C"]' now
+        for tag in ef_com:
             list.append(converter.toDG(tag))
         return list
 
@@ -338,8 +357,25 @@ class EPassport(dict, logger.Logger):
 
         @return: A list of dataGroup objects.
         """
+
+        # Temp fix for 6F63 Data not found issue
+        double_tag = False
+        ef_com = self["Common"]["5C"]
+        for tag in ef_com:
+            if tag == "6F63":
+                ef_com.append("6F")
+                ef_com.append("63")
+                double_tag = True
+        
+        if double_tag:
+            ef_com.remove("6F63")
+        
+        # print(ef_com)
+        ###
+        
         list = []
-        for dg in self["Common"]["5C"]:
+        # Reading 'ef_com' instead of 'self["Common"]["5C"]' now
+        for dg in ef_com:
             try:
                 list.append(self[dg])
             except Exception:
@@ -353,7 +389,7 @@ class EPassport(dict, logger.Logger):
         @return: A dictionary with every dataGroup objects present in the passport.
         """
         self.log("Reading Passport")
-        self.readCom()
+        # self.readCom()
         self.readDataGroups()
         self.readSod()
 

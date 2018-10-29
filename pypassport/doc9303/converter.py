@@ -143,10 +143,10 @@ def _getPosition(data):
     print("Data not found:", str(data))
     
     # Hack for unknown data
-    data = "60"
-    for l in _Table:
-        try:
-            return _Table[l].index(data)
-        except ValueError:
-            pass    # Well this now never happens anymore
-    raise KeyError, "Invalid Data Group: "+ str(data)
+    # data = "60"
+    # for l in _Table:
+    #     try:
+    #         return _Table[l].index(data)
+    #     except ValueError:
+    #         pass    # Well this now never happens anymore
+    # raise KeyError, "Invalid Data Group: "+ str(data)
