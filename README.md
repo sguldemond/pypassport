@@ -1,53 +1,44 @@
 # pypassport-2.0
-Taken from epassportviewer and added support for Dutch ECDSA Active Authentication. Not sure what the difference is between [this](https://github.com/andrew867/epassportviewer/tree/master/pypassport-2.0) 2.0 and the 1.0 of [Google Code](https://code.google.com/archive/p/pypassport/)
+A clone of the [pypassport-2.0 repo](https://github.com/landgenoot/pypassport-2.0).
 
-__Note: Also needs a modified version of python-ecdsa because of support for brainpoolp320r1, which can be found in [this pull request](https://github.com/warner/python-ecdsa/pull/61/commits/91140ad7b2840a97184fc31b0aac5b13c15bf22d)__
+## Changes I made
 
-## pyPassport Installation Instructions
-
-Until pyPassport reach a stable state the installation has to be done from source. Later binary packages will be released for the following platforms:
-
-Windows (.exe)
-Linux (.deb/.rmp)
-Mac OSX (if possible, mpkg/dmg?)
-Sources
-
-## Supported platforms
-
-Any platform capable of running Python 2.5/2.6 (and C based module). pyPassport has been successfully installed from sources on Windows, Linux (Ubuntu) and Mac OSX.
-
-## Dependencies
-
-pyPassport is build on top of some other open-sources libraries. All of them are mandatory to use pyPassport.
-
-pyPassport also uses other open-source tools to perform specific processing, installing those tools is not mandatory. However, if those optional tools are not installed pyPassport functionalities are reduce.
-
-## Mandatory
-
-The following packages are required to run the application.
-
-List of other dependencies: python 2.5 or 2.6.
-List of python dependencies: pyasn1, pyscard, pycrypto, setuptools.
-Python dependencies can be installed using the code sharing python platform PyPI using the following command:
+Changing protocol from T0 to T1, based on experiments done using [gscriptor](ludovic.rousseau.free.fr/softwares/pcsc-tools/)
 ```
-Python/scripts$ easy_install package_name
+# self._pcsc_connection.connect(self.sc.scard.SCARD_PCI_T0)
+self._pcsc_connection.connect(self.sc.scard.SCARD_PCI_T1)
 ```
-To install pyscard on MAC OSX you can use this mpkg file
+pypassport > reader.py > class PcscReader > def connect: 
 
-## Optional
-
-To complete the installation, two additional packages should be installed:
-
-OpenSSL for certificate verification; (already included in Mac OSX)
-geoJasper to manipulate images in JPEG2000 format;
-Offline installation
-
-Please use the python installer script to install pypassport with the following command:
+Adding this line,
 ```
-$ python setup.py install
+mrz = self._mrz
 ```
-All files will be installed in the $PythonDir/sites-packages/pypassport directory, ready to be imported in your project.
+to pypassport > doc9303 > mrz.py > class MRZ > def _checkDigitsTD1 & def _checkDigitsTD2
 
-## Online installation
+When running the 'EPassport.readPassport' method we came across an error with this message:
+```
+('Data not found:', '6F63')
+```
+This is most likely a merging of the '6F' and '63' which are the locations of DG15 (Public Keys) and DG3 (Finger Print) respectively on the LDS (Logical Data Structure). For some reason these two tags are stored conjoined in the common file, which contains a list of available DG's. This list can be read using 'EPassport.readCom'.
 
-Once the software reach a stable state, code will be posted on the code sharing python platform PyPI.
+I added this code to 'readCom', which does not yet fix the whole problem:
+```
+# Temp fix for 6F63 Data not found issue
+double_tag = False
+ef_com = self["Common"]["5C"]
+for tag in ef_com:
+  if tag == "6F63":
+  ef_com.append("6F")
+  ef_com.append("63")
+  double_tag = True
+        
+  if double_tag:
+  ef_com.remove("6F63")
+        
+ # print(ef_com)
+ ###
+```
+
+For some reason DG15 returns empty and for DG3 the 'securty status is not satisfied'.
+For now this can be skipped, with the info from DG15 (public keys) the info on the NFC can be varified as valid, but this is not relevant for us at this moment. We also don't need DG3 (Finger Print).
